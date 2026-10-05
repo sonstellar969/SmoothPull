@@ -1,0 +1,71 @@
+#ptr-indicator {
+  --ptr-progress: 0;
+  --ptr-distance: 0px;
+  position: fixed;
+  z-index: 2147483647;
+  top: 42px;
+  left: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, calc(var(--ptr-distance) * .55));
+  transition: opacity 100ms ease;
+  font: 13px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  color: rgba(25, 25, 28, .78);
+}
+
+#ptr-indicator.ptr-visible {
+  opacity: 1;
+}
+
+#ptr-indicator .ptr-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(118, 118, 122, .88);
+  box-shadow: 0 4px 13px rgba(0, 0, 0, .28);
+  backdrop-filter: blur(8px);
+}
+
+#ptr-indicator .ptr-label {
+  display: none;
+}
+
+#ptr-indicator .ptr-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  color: rgba(255, 255, 255, .78);
+  font: 34px/1 -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  transform: rotate(calc(240deg * var(--ptr-progress)));
+  transform-origin: center;
+  transition: color 100ms ease;
+}
+
+#ptr-indicator .ptr-icon::before {
+  content: "↻";
+  display: block;
+  transform: translateY(-1px);
+}
+
+#ptr-indicator.ptr-armed .ptr-icon {
+  color: #fff;
+  animation: ptr-spin 1s linear infinite;
+}
+
+@keyframes ptr-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-color-scheme: dark) {
+  #ptr-indicator { color: rgba(245, 245, 248, .86); }
+  #ptr-indicator .ptr-card { background: rgba(95, 95, 100, .9); }
+  #ptr-indicator .ptr-icon { color: rgba(255, 255, 255, .82); }
+  #ptr-indicator.ptr-armed .ptr-icon { color: #fff; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ptr-indicator { transition: none; }
+  #ptr-indicator .ptr-icon { transition: none; animation: none; }
+}
