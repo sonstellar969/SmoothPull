@@ -216,6 +216,26 @@
     cooldownUntil = performance.now() + MOMENTUM_COOLDOWN_MS;
   }
 
+  function abandonGestureAwayFromTop() {
+    if (closing) return;
+    clearTimers();
+    pull = 0;
+    eventCount = 0;
+    armed = false;
+    gestureActive = false;
+    ending = false;
+    cooldownUntil = 0;
+    sessionStartedAt = 0;
+    armedAt = 0;
+    // Remember that the next top arrival came from an ordinary scroll. The
+    // next pull must still wait for the top-settle gate.
+    mustSettleAtTop = true;
+    reachedTopAt = 0;
+    topNormalEventSeen = false;
+    lastTopNormalAt = 0;
+    hideIndicator();
+  }
+
   function reloadAfterSmoothRelease() {
     if (closing) return;
     closing = true;
@@ -268,6 +288,16 @@
       event.preventDefault();
       return;
     }
+
+    // This is an absolute boundary: while the document is away from the
+    // top, SmoothPull must never consume a wheel event or alter scrolling.
+    // Clearing stale state here also prevents a previous top interaction from
+    // affecting the user's normal upward scroll from the bottom of a page.
+    if (!pageIsAtTop()) {
+      abandonGestureAwayFromTop();
+      return;
+    }
+
     // With macOS natural scrolling, moving two fingers downward produces a
     // negative wheel delta in Firefox. Negate it so `pullDistance` is positive.
     const pullDistance = -normalizedDeltaY(event);
